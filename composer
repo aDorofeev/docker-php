@@ -1,0 +1,33 @@
+#!/usr/bin/env bash
+
+set -o errexit
+set -o nounset
+
+SCRIPT_PATH="$0"
+ARGS="$@"
+COMPOSER_DIR="${HOME}/.bin"
+COMPOSER_PATH="${COMPOSER_DIR}/composer.phar"
+SF_PROJECT_PATH="${HOME}/symfony"
+
+# if docker image is built with "USER root" - switch user
+if [ "$(whoami)" == 'root' ] ; then
+    su -s /bin/bash - www-data -c "${SCRIPT_PATH} ${ARGS}"
+else
+    if [ ! -f "${COMPOSER_PATH}" ] ; then
+        mkdir -p "${COMPOSER_DIR}"
+        cd "${COMPOSER_DIR}"
+        INSTALLER_SIG=$(php -r "echo file_get_contents('https://composer.github.io/installer.sig');")
+        php -r "copy('https://getcomposer.org/installer', 'composer-setup.php');"
+        php -r "if (hash_file('SHA384', 'composer-setup.php') === '${INSTALLER_SIG}') { echo 'Installer verified' . PHP_EOL; } else { echo 'Installer corrupt' . PHP_EOL; unlink('composer-setup.php'); exit(1); }"
+        php composer-setup.php
+        php -r "unlink('composer-setup.php');"
+    fi
+
+    # check for updates when file is older than 30 days
+    if [[ $(find "${COMPOSER_PATH}" -mtime +30 -print) ]]; then
+        "${COMPOSER_PATH}" self-update
+    fi
+
+    # launch composer
+    bash -c "cd ${SF_PROJECT_PATH}; ${COMPOSER_PATH} ${ARGS}"
+fi

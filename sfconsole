@@ -1,0 +1,23 @@
+#!/usr/bin/env bash
+
+set -o errexit
+set -o nounset
+
+# parameters
+PHP_USER="www-data"
+PHP_HOME="$(getent passwd "${PHP_USER}" | cut -d: -f6)"
+SF_PROJECT_PATH="${PHP_HOME}/symfony"
+
+# detect console entrypoint path: is it "new" or "old" way
+if [ -f "${SF_PROJECT_PATH}/bin/console" ] ; then
+    COMMAND="${SF_PROJECT_PATH}/bin/console $@"
+else
+    COMMAND="${SF_PROJECT_PATH}/app/console $@"
+fi
+
+# if docker image is built with "USER root" - switch user
+if [ ! "$(whoami)" == "${PHP_USER}" ] ; then
+    su -s /bin/bash - "${PHP_USER}" -c "cd ${SF_PROJECT_PATH}; $COMMAND"
+else
+    bash -c "cd ${SF_PROJECT_PATH}; $COMMAND"
+fi
