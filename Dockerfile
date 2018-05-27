@@ -33,6 +33,8 @@ RUN install_packages \
     php5.6-gd \
     php5.6-zip
 
+RUN update-alternatives --set php /usr/bin/php5.6
+
 # install other packages
 RUN install_packages \
    git
