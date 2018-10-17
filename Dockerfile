@@ -35,7 +35,9 @@ RUN install_packages \
 
 # install other packages
 RUN install_packages \
-   git
+    git \
+    zip \
+    unzip
 
 # php configuration
 RUN rm -f /etc/php/7.2/fpm/pool.d/www.conf
