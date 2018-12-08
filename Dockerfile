@@ -12,8 +12,8 @@ RUN install_packages \
   ca-certificates
 
 # install php
-RUN curl -o /etc/apt/trusted.gpg.d/php.gpg https://packages.sury.org/php/apt.gpg && \
-    echo "deb https://packages.sury.org/php/ $(lsb_release -sc) main" > /etc/apt/sources.list.d/php.list
+RUN curl -L -o /etc/apt/trusted.gpg.d/php.gpg https://packages.sury.xyz/php/apt.gpg && \
+    echo "deb https://packages.sury.xyz/php/ $(lsb_release -sc) main" > /etc/apt/sources.list.d/php.list
 
 RUN install_packages \
     php7.2-fpm \
