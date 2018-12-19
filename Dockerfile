@@ -24,7 +24,7 @@ RUN install_packages \
     php7.3-mysql \
 #    php7.2-mcrypt \ -- dropped in favor of openssl
 # apc user cache (uncomment, or copy to your Dockerfile to enable)
-#    php7.2-apcu \
+#    php7.3-apcu \
     php7.3-mbstring \
 # redis is good for sessions, a better replacement for memcached
     php7.3-redis \
@@ -52,12 +52,12 @@ RUN chown -R www-data:1000 /var/www
 
 RUN ln -sf /dev/stderr /var/log/www.log.slow
 
-ADD symfony.pool.conf /etc/php/7.2/fpm/pool.d/
+ADD symfony.pool.conf /etc/php/7.3/fpm/pool.d/
 
 ADD sfconsole /usr/bin/
 ADD composer /usr/bin/
 
-CMD ["/usr/sbin/php-fpm7.2"]
+CMD ["/usr/sbin/php-fpm7.3"]
 
 RUN chown -R www-data. /var/www/
 USER www-data
