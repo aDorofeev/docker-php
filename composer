@@ -10,10 +10,10 @@ COMPOSER_PATH="${COMPOSER_DIR}/composer.phar"
 SF_PROJECT_PATH="${HOME}/symfony"
 
 # if docker image is built with "USER root" - switch user
-if [ "$(whoami)" == 'root' ] ; then
+if [[ "$(whoami)" == 'root' ]] ; then
     su -s /bin/bash - www-data -c "${SCRIPT_PATH} ${ARGS}"
 else
-    if [ ! -f "${COMPOSER_PATH}" ] ; then
+    if [[ ! -f "${COMPOSER_PATH}" ]] ; then
         mkdir -p "${COMPOSER_DIR}"
         cd "${COMPOSER_DIR}"
         INSTALLER_SIG=$(php -r "echo file_get_contents('https://composer.github.io/installer.sig');")
@@ -22,6 +22,7 @@ else
         php composer-setup.php
         php -r "unlink('composer-setup.php');"
         composer global require hirak/prestissimo
+        cd -
     fi
 
     # check for updates when file is older than 30 days
@@ -31,5 +32,5 @@ else
     fi
 
     # launch composer
-    bash -c "cd ${SF_PROJECT_PATH}; ${COMPOSER_PATH} ${ARGS}"
+    bash -c "${COMPOSER_PATH} ${ARGS}"
 fi
