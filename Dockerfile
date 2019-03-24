@@ -8,13 +8,13 @@ RUN ln -snf /usr/share/zoneinfo/$TIMEZONE /etc/localtime && echo $TIMEZONE > /et
 RUN install_packages \
   curl \
   apt-transport-https \
-  lsb-release \
   ca-certificates
 
 # install php
 RUN curl -L -o /etc/apt/trusted.gpg.d/php.gpg https://packages.sury.xyz/php/apt.gpg && \
-    echo "deb https://packages.sury.xyz/php/ $(lsb_release -sc) main" > /etc/apt/sources.list.d/php.list
+    echo "deb https://packages.sury.xyz/php/ jessie main" > /etc/apt/sources.list.d/php.list
 
+# php modules
 RUN install_packages \
     php7.3-fpm \
     php7.3-cli \
@@ -22,16 +22,29 @@ RUN install_packages \
     php7.3-curl \
     php7.3-intl \
     php7.3-mysql \
-#    php7.2-mcrypt \ -- dropped in favor of openssl
-# apc user cache (uncomment, or copy to your Dockerfile to enable)
-#    php7.3-apcu \
     php7.3-mbstring \
-# redis is good for sessions, a better replacement for memcached
     php7.3-redis \
     php7.3-bcmath \
     php7.3-imagick \
     php7.3-gd \
     php7.3-zip
+
+# php-mongodb module
+RUN install_packages \
+        php-pear \
+        php7.3-dev \
+        make && \
+    pecl install mongodb-1.5.3 && \
+    echo "extension=mongodb.so" > "/etc/php/7.3/fpm/conf.d/20-mongodb.ini" && \
+    echo "extension=mongodb.so" > "/etc/php/7.3/cli/conf.d/20-mongodb.ini"
+
+# clean up
+RUN apt-get remove --auto-remove --assume-yes \
+        php-pear \
+        php7.3-dev \
+        gcc \
+        make && \
+    apt-get clean
 
 # install other packages
 RUN install_packages \
@@ -52,10 +65,10 @@ RUN chown -R www-data:1000 /var/www
 
 RUN ln -sf /dev/stderr /var/log/www.log.slow
 
-ADD symfony.pool.conf /etc/php/7.3/fpm/pool.d/
+COPY symfony.pool.conf /etc/php/7.3/fpm/pool.d/
 
-ADD sfconsole /usr/bin/
-ADD composer /usr/bin/
+COPY sfconsole /usr/bin/
+COPY composer /usr/bin/
 
 CMD ["/usr/sbin/php-fpm7.3"]
 
