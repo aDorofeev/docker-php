@@ -60,7 +60,7 @@ ADD composer /usr/bin/
 CMD ["/usr/sbin/php-fpm7.2"]
 
 RUN chown -R www-data. /var/www/
-USER www-data
+#USER www-data
 RUN mkdir /var/www/.composer
 WORKDIR /var/www/symfony
 
