@@ -1,4 +1,4 @@
-FROM bitnami/minideb:jessie
+FROM bitnami/minideb:stretch
 
 # Set timezone
 ENV TIMEZONE=Etc/UTC
@@ -11,8 +11,8 @@ RUN install_packages \
   ca-certificates
 
 # install php
-RUN curl -L -o /etc/apt/trusted.gpg.d/php.gpg https://packages.sury.xyz/php/apt.gpg && \
-    echo "deb https://packages.sury.xyz/php/ jessie main" > /etc/apt/sources.list.d/php.list
+RUN curl -s -L -o /etc/apt/trusted.gpg.d/php.gpg https://packages.sury.org/php/apt.gpg && \
+    echo "deb http://packages.sury.org/php stretch main" > /etc/apt/sources.list.d/php-sury.list
 
 # php modules
 RUN install_packages \
@@ -30,16 +30,17 @@ RUN install_packages \
     php7.3-zip
 
 # php-mongodb module
+    # prepare
 RUN install_packages \
         php-pear \
         php7.3-dev \
         make && \
+    # install
     pecl install mongodb-1.5.3 && \
     echo "extension=mongodb.so" > "/etc/php/7.3/fpm/conf.d/20-mongodb.ini" && \
-    echo "extension=mongodb.so" > "/etc/php/7.3/cli/conf.d/20-mongodb.ini"
-
-# clean up
-RUN apt-get remove --auto-remove --assume-yes \
+    echo "extension=mongodb.so" > "/etc/php/7.3/cli/conf.d/20-mongodb.ini" && \
+    # cleanup
+    apt-get remove --auto-remove --assume-yes \
         php-pear \
         php7.3-dev \
         gcc \
