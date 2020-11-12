@@ -16,33 +16,33 @@ RUN curl -s -L -o /etc/apt/trusted.gpg.d/php.gpg https://packages.sury.org/php/a
 
 # php modules
 RUN install_packages \
-    php7.3-fpm \
-    php7.3-cli \
-    php7.3-xml \
-    php7.3-curl \
-    php7.3-intl \
-    php7.3-mysql \
-    php7.3-mbstring \
-    php7.3-redis \
-    php7.3-bcmath \
-    php7.3-imagick \
-    php7.3-gd \
-    php7.3-zip
+    php7.4-fpm \
+    php7.4-cli \
+    php7.4-xml \
+    php7.4-curl \
+    php7.4-intl \
+    php7.4-mysql \
+    php7.4-mbstring \
+    php7.4-redis \
+    php7.4-bcmath \
+    php7.4-imagick \
+    php7.4-gd \
+    php7.4-zip
 
 # php-mongodb module
     # prepare
 RUN install_packages \
         php-pear \
-        php7.3-dev \
+        php7.4-dev \
         make && \
     # install
     pecl install mongodb-1.5.3 && \
-    echo "extension=mongodb.so" > "/etc/php/7.3/fpm/conf.d/20-mongodb.ini" && \
-    echo "extension=mongodb.so" > "/etc/php/7.3/cli/conf.d/20-mongodb.ini" && \
+    echo "extension=mongodb.so" > "/etc/php/7.4/fpm/conf.d/20-mongodb.ini" && \
+    echo "extension=mongodb.so" > "/etc/php/7.4/cli/conf.d/20-mongodb.ini" && \
     # cleanup
     apt-get remove --auto-remove --assume-yes \
         php-pear \
-        php7.3-dev \
+        php7.4-dev \
         gcc \
         make && \
     apt-get clean
@@ -54,11 +54,11 @@ RUN install_packages \
     unzip
 
 # php configuration
-RUN rm -f /etc/php/7.3/fpm/pool.d/www.conf
+RUN rm -f /etc/php/7.4/fpm/pool.d/www.conf
 RUN mkdir /run/php
-RUN sed -i "/pid = .*/c\;pid = /run/php/php7.3-fpm.pid" /etc/php/7.3/fpm/php-fpm.conf \
-    && sed -i "/;daemonize = .*/c\daemonize = no" /etc/php/7.3/fpm/php-fpm.conf \
-    && sed -i "/error_log = .*/c\error_log = /proc/self/fd/2" /etc/php/7.3/fpm/php-fpm.conf \
+RUN sed -i "/pid = .*/c\;pid = /run/php/php7.4-fpm.pid" /etc/php/7.4/fpm/php-fpm.conf \
+    && sed -i "/;daemonize = .*/c\daemonize = no" /etc/php/7.4/fpm/php-fpm.conf \
+    && sed -i "/error_log = .*/c\error_log = /proc/self/fd/2" /etc/php/7.4/fpm/php-fpm.conf \
     && usermod -u 1000 www-data
 
 RUN mkdir -p /var/www
@@ -66,12 +66,12 @@ RUN chown -R www-data:1000 /var/www
 
 RUN ln -sf /dev/stderr /var/log/www.log.slow
 
-COPY symfony.pool.conf /etc/php/7.3/fpm/pool.d/
+COPY symfony.pool.conf /etc/php/7.4/fpm/pool.d/
 
 COPY sfconsole /usr/bin/
 COPY composer /usr/bin/
 
-CMD ["/usr/sbin/php-fpm7.3"]
+CMD ["/usr/sbin/php-fpm7.4"]
 
 RUN chown -R www-data. /var/www/
 USER www-data
