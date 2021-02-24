@@ -21,7 +21,6 @@ else
         php -r "if (hash_file('SHA384', 'composer-setup.php') === '${INSTALLER_SIG}') { echo 'Installer verified' . PHP_EOL; } else { echo 'Installer corrupt' . PHP_EOL; unlink('composer-setup.php'); exit(1); }"
         php composer-setup.php
         php -r "unlink('composer-setup.php');"
-        composer global require hirak/prestissimo
         cd -
     fi
 
